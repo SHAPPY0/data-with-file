@@ -7,62 +7,57 @@
     <!-- JS -->
     <script src="http://code.angularjs.org/1.4.0/angular.js"></script> 
 </head>
-<body class="container" ng-app="app" ng-controller="main">
+<body class="container" ng-app="app" ng-controller="MyCtrl">
     
-    <form method="post" enctype="multipart/form-data">
-        <input type="text" name="t" ng-model="d.t" /><br /><br />
-        <input type="text" name="d" ng-model="d.d" /><br /><br />
-        <input type="file" name="file" file-model="d.image" /><br /><br /> 
-        <button ng-click="post()">Post</button>
-    </form>
-    {{d}}
- 
+   <h2>Add Subject and Books:</h2>
+<form method="post">
+   <div class="row" >
+      <div class="col-lg-9">
+          <p>Add Subject</p>
+         <input type="text" class="form-control" name="subject_name" ng-model="dd.subject_name" placeholder="Subject Name" />
+      </div>
+       
+   </div><br />
+     <div class="row" >
+       <p>Add Books</p>
+
+       <div ng-repeat="dd in dd.books">
+      <div class="col-lg-3" > 
+         <input type="text" class="form-control" name="book_name" ng-model="dd.book_name" placeholder="Book Name"/> 
+          
+      </div> 
+      <div class="col-lg-3">
+         <input type="text" class="form-control" name="book_author" ng-model="dd.book_author" placeholder="Book Author"/>
+         <hr />
+      </div>
+       </div>
+
+      <div class="col-lg-6" >
+          <button class="btn  btn-light" ng-click="addmore(dd)">Add More Books</button>
+      </div> 
+      
+   </div> <br/>
+   <button class="btn  btn-light" ng-click="cccc()">Add</button> 
+
+   {{item | json}}
+   
+</form>
+ <script src="https://angular-file-upload.appspot.com/js/ng-file-upload.js"></script>
      <script>
- var app= angular.module('app', []);
- /*=========diretive==========*/
- app.directive('fileModel', ['$parse', function ($parse) {
-        return {
-           restrict: 'A',
-           link: function(scope, element, attrs) {
-              var model = $parse(attrs.fileModel);
-              var modelSetter = model.assign; 
-              element.bind('change', function(){
-                 scope.$apply(function(){
-                    modelSetter(scope, element[0].files[0]);
+ var app= angular.module('app', ['ngFileUpload']);
+ app.controller('MyCtrl',function($scope,$http){
+   $scope.dd={books:[{ "book_name":"", "book_author":"" }] };
+$scope.addmore=function(){ 
+  $scope.dd.books.push({}); 
+}
+$scope.cccc=function(){  
+  console.log($scope.dd); 
+  $http.post('/multi', $scope.dd).success(function(res){
+    console.log(res);
+  })
 
-                 });
-              });
-           }
-        };
-     }]);
-
- /*======service=========*/
- app.service('fileUpload', ['$http',function ($http) {
-        this.uploadFileToUrl = function( data, uploadUrl){  
-           var fd=new FormData();   
-            for(key in data){
-              fd.append(key, data[key]);
-              console.log(fd);
-            } 
-           $http.post(uploadUrl,fd,{
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined} }) 
-           .success(function(res){
-            console.log(res.length);
-            })
-           .error(function(){
-           });
-        }
-     }]);
- /*=====controller to send data===*/
- app.controller("main",function($scope, fileUpload){
-    $scope.post=function(){ 
-        var data=$scope.d;   
-        var uploadUrl="/upload";
-        fileUpload.uploadFileToUrl(data, uploadUrl);  
-    } 
- });
-    
+}
+ })
 
 </script>
 </body>
