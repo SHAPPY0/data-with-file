@@ -5,36 +5,30 @@ var fs=require('fs-extra');
 var multipart = require('connect-multiparty');
 var mime           =require('mime-types');
 var path           =require('path');
+var multer           =require('multer');
 var table = require('./model/model');
+var Aa = require('./model/aa');
 
-var bodyParser=require('body-parser');
+var bodyParser=require('body-parser'); 
 
- app.post('/upload', function(req,res){
- 	var fstream;
- 	req.pipe(req.busboy);
- 	req.busboy.on('file', function(fieldname,file,filename){ 
- 		console.log(filename);
- 		var filePath=path.join(__dirname, '../file', filename);
- 		fstream=fs.createWriteStream(filePath);
- 		file.pipe(fstream);
- 		fstream.on('close', function(){
- 			console.log('file saved...');  
- 			var data=new table({
- 				t:req.body.t,
- 				d:req.body.d,
- 				img:filename
- 			});
- 			data.save(function(err,data){
- 				if(err){throw err}
- 					else{
- 						console.log(data);
- 						res.json(data)
- 					}
- 			})
- 		});
-
- 	});
-
- })
+ app.post('/multi',function(req,res){ 
+  
+  var ss=new Aa({
+    subject_name:req.body.subject_name,
+    books:[{
+      book_name:req.body.book_name,
+      book_author:req.body.book_author
+    }]
+  });
+  ss.save(function(err,data){
+    if(err){res.json(err)}
+      else{
+        res.json(data)
+      }
+  })
+})
 
 module.exports=app;
+
+
+  
